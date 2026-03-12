@@ -1,0 +1,10 @@
+.Rhistory
+.RData
+.Rproj.user
+.DS_Store
+Thumbs.db
+results/figures/*.png
+results/figures/*.pdf
+results/qc/*.png
+results/deg/*.csv
+results/enrichment/*.csv

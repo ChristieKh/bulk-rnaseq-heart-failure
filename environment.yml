@@ -1,0 +1,16 @@
+name: rnaseq-gse128343
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.3
+  - r-tidyverse
+  - r-data.table
+  - r-readr
+  - r-pheatmap
+  - r-ggplot2
+  - bioconductor-deseq2
+  - bioconductor-apeglm
+  - bioconductor-enhancedvolcano
+  - bioconductor-clusterprofiler
+  - bioconductor-org.hs.eg.db
