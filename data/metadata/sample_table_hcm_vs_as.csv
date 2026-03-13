@@ -1,0 +1,14 @@
+sample_id,condition,condition_short,sex,age
+HCM-1,hypertrophic cardiomyopathy,HCM,male,38
+HCM-2,hypertrophic cardiomyopathy,HCM,male,39
+HCM-3,hypertrophic cardiomyopathy,HCM,male,56
+HCM-4,hypertrophic cardiomyopathy,HCM,female,62
+HCM-5,hypertrophic cardiomyopathy,HCM,female,45
+HCM-6,hypertrophic cardiomyopathy,HCM,female,64
+HCM-7,hypertrophic cardiomyopathy,HCM,male,67
+HCM-8,hypertrophic cardiomyopathy,HCM,male,70
+St-1,aortic stenosis,AS,male,63
+St-2,aortic stenosis,AS,male,71
+St-3,aortic stenosis,AS,female,48
+St-4,aortic stenosis,AS,male,68
+St-5,aortic stenosis,AS,male,70
