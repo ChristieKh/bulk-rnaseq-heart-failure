@@ -1,0 +1,14 @@
+sample_ID	condition	sex	age
+HCM-1	hypertrophic cardiomyopathy	male	38
+HCM-2	hypertrophic cardiomyopathy	male	39
+HCM-3	hypertrophic cardiomyopathy	male	56
+HCM-4	hypertrophic cardiomyopathy	female	62
+HCM-5	hypertrophic cardiomyopathy	female	45
+HCM-6	hypertrophic cardiomyopathy	female	64
+HCM-7	hypertrophic cardiomyopathy	male	67
+HCM-8	hypertrophic cardiomyopathy	female	70
+St-1	aortic stenosis	male	63
+St-2	aortic stenosis	male	71
+St-3	aortic stenosis	female	48
+St-4	aortic stenosis	male	68
+St-5	aortic stenosis	male	70

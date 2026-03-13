@@ -1,92 +1,125 @@
-# Bulk RNA-seq analysis of Alzheimer’s-associated APP mutation in human iPSC-derived neurons
+# Bulk RNA-seq analysis of primary versus pressure-overload cardiac hypertrophy in human myocardium
+
+A reproducible bulk RNA-seq reanalysis of human myocardial tissue comparing hypertrophic cardiomyopathy and aortic-stenosis-induced hypertrophy.
 
 ## Project overview
 
-This project is an analytical reanalysis of a public bulk RNA-seq dataset from human iPSC-derived neurons carrying Alzheimer’s-associated mutations.
+This repository contains a focused transcriptomic reanalysis of human cardiac hypertrophy using public bulk RNA-seq data.
 
-For the first version of the project, I focus on one clean and interpretable contrast: **WT vs APP mutant neurons**. The aim is to identify gene-expression changes associated with an Alzheimer’s-related neuronal state and to interpret them in a biologically meaningful way.
+The project examines gene-expression differences between two pathological remodeling states in the human heart:
+
+- **hypertrophic cardiomyopathy (HCM)**, representing primary myocardial hypertrophy
+- **aortic-stenosis-induced hypertrophy (AS)**, representing secondary hypertrophy caused by chronic pressure overload
+
+The analysis is designed as a compact, interpretable RNA-seq project centered on raw-count-based differential expression, sample-level exploration, and pathway-oriented biological interpretation.
 
 ## Research question
 
-**How does an Alzheimer’s-associated APP mutation affect gene-expression patterns in human iPSC-derived neurons?**
+**How does hypertrophic cardiomyopathy differ transcriptionally from pressure-overload cardiac hypertrophy in human myocardium?**
+
+## Source study
+
+This project is based on the public dataset [**GSE206978**](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE206978), generated in the study:
+
+[**Novel Genes Involved in Hypertrophic Cardiomyopathy: Data of Transcriptome and Methylome Profiling**](https://pmc.ncbi.nlm.nih.gov/articles/PMC9739701/)
+
+The original study compared myocardial samples from patients with **HCM** and **AS** and used both **bulk RNA-seq** and **genome-wide DNA methylation profiling**.
+
+This repository focuses only on the **RNA-seq component** and reanalyzes the public raw count matrix as an independent transcriptomic workflow.
+
+## Biological context
+
+Cardiac hypertrophy is not a single biological entity. Similar tissue-level enlargement can arise through different mechanisms.
+
+In **HCM**, hypertrophy reflects a primary disorder of the myocardium, often linked to intrinsic abnormalities of cardiac muscle structure and function. In **AS**, hypertrophy develops as an adaptive response to long-term pressure overload, because the left ventricle must pump against an obstructed aortic valve.
+
+This makes the HCM-versus-AS comparison biologically informative: both groups show hypertrophied myocardium, but the underlying drivers of remodeling differ. The project therefore focuses on transcriptomic features that distinguish **primary myocardial disease** from **pressure-overload remodeling**.
 
 ## Why this dataset
 
-I selected **GSE128343** because it is a compact and biologically clear dataset suitable for a first analytical RNA-seq project:
+I selected **GSE206978** because it is well suited to a first focused analytical RNA-seq project in cardiac disease.
 
-- human samples
-- bulk RNA-seq
-- iPSC-derived neurons
-- Alzheimer’s-related mutations
-- relatively small and manageable sample size
-- clean experimental setup with a shared cell-line background
+It provides:
+- human myocardial tissue
+- bulk RNA-seq data
+- a gene-level raw count matrix suitable for **DESeq2**
+- a clearly defined comparison with direct biological meaning
+- a manageable sample size for exploratory and differential-expression analysis
 
-This makes it a good dataset for learning how to connect transcriptomic analysis with biological interpretation.
-
-## Biological background
-
-Induced pluripotent stem cells (iPSCs) are cells that can be reprogrammed into a stem-like state and then differentiated into specific cell types. In this dataset, human iPSCs were differentiated into neurons.
-
-This allows researchers to study disease-relevant molecular changes in a controlled human cellular model. Here, neurons carrying Alzheimer’s-associated mutations are compared with wild-type neurons to investigate transcriptomic changes linked to disease biology.
+This makes it a practical dataset for building a reproducible workflow while still engaging with a meaningful disease-related question.
 
 ## Dataset
 
-**Accession:** GSE128343  
-**Model:** human iPSC-derived neurons  
-**Data type:** bulk RNA-seq gene-level counts  
-**Current analysis scope:** WT vs APP
+**Accession:** GSE206978  
+**Tissue:** human myocardium  
+**Data type:** bulk RNA-seq raw counts  
+**Current comparison:** HCM vs AS
 
-### Samples used in this project
+### Samples included in the current analysis
 
-| Group | Sample IDs | n |
-|------|------|---|
-| WT | 1222, 1223, 1224 | 3 |
-| APP | 1225, 1226, 1227 | 3 |
-
-### Samples not yet included
-
-| Group | Sample IDs | n |
-|------|------|---|
-| PSEN1 | 1228, 1229, 1230 | 3 |
-| APP/PSEN1 | 1231, 1232, 1233 | 3 |
-
-These groups are kept for future project extensions.
+| Group | n |
+|------|---:|
+| HCM | 8 |
+| AS | 5 |
 
 ## Input data
 
-The project uses a public processed count matrix provided on GEO together with sample metadata.
+The analysis uses public GEO files together with a cleaned project-specific sample sheet.
 
-- `data/raw/GSE128343_RNAseq_raw.txt` — gene-by-sample count matrix
-- `data/raw/GSE128343_series_matrix.txt` — dataset metadata and sample annotations
-- `data/metadata/sample_table_wt_vs_app.csv` — analysis-specific sample table for the first contrast
+- `data/raw/GSE206978_HCM_vs_stenosis_raw_counts.tsv.gz` — gene-level raw count matrix
+- `data/raw/GSE206978_Sample_description.tsv` — sample-level metadata from GEO
+- `data/metadata/sample_table_hcm_vs_as.csv` — cleaned analysis-ready sample table
 
 ## Analytical workflow
 
-1. Load count matrix and sample metadata
-2. Subset samples for WT vs APP comparison
-3. Perform count-level QC and exploratory analysis
-4. Run differential expression analysis
-5. Visualize transcriptomic differences
-6. Perform functional enrichment analysis
-7. Interpret results in the context of neuronal dysfunction and Alzheimer’s-related biology
+1. Import raw counts and sample metadata  
+2. Build an analysis-ready sample table  
+3. Perform sample-level quality checks and exploratory analysis  
+4. Apply count transformation for visualization  
+5. Run differential expression analysis with **DESeq2**  
+6. Generate PCA, volcano plot, and heatmap of top differentially expressed genes  
+7. Perform functional enrichment analysis  
+8. Interpret results in the context of cardiac hypertrophic remodeling
 
 ## Main outputs
 
-- sample metadata table
-- filtered count matrix
+- cleaned metadata table
+- analysis-ready sample sheet
 - PCA plot
 - sample distance heatmap
 - volcano plot
-- top differentially expressed genes
+- heatmap of top differentially expressed genes
+- differential expression results table
 - functional enrichment results
-- biological interpretation notes
+- interpretation notes for key biological patterns
 
 ## Repository structure
 
-```
-text
+```text
 data/
 scripts/
 results/
 docs/
 ```
+
+## Project scope
+
+This repository focuses on analytical interpretation of a public bulk RNA-seq dataset using gene-level raw counts.
+
+The current analysis is designed to emphasize:
+
+- study design and contrast definition
+- metadata handling
+- exploratory transcriptomic analysis
+- differential expression analysis with DESeq2
+- pathway-level interpretation
+- biologically informed discussion of cardiac remodeling
+
+The associated study also included genome-wide DNA methylation analysis, but this repository is currently limited to the RNA-seq component.
+
+## Limitations
+
+- small sample size
+- comparison between two pathological states rather than disease versus healthy tissue
+- biological conclusions should be interpreted as transcriptomic associations rather than causal mechanisms
+- analysis starts from public processed gene-level counts rather than raw FASTQ files
