@@ -8,3 +8,5 @@ results/figures/*.pdf
 results/qc/*.png
 results/deg/*.csv
 results/enrichment/*.csv
+
+logs/
