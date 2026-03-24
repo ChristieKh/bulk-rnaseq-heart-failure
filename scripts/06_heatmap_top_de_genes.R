@@ -1,26 +1,40 @@
 library(pheatmap)
 
-# 0. Load DE results
+library(org.Hs.eg.db)
+library(AnnotationDbi)
+
+# 1. Load DE results
 vsd <- readRDS("data/processed/vsd.rds")
 res_df <- readRDS("data/processed/deseq_results.rds")
 
-# 1. Keep only significant genes
-sig_res <- res_df[!is.na(res_df$padj) & res_df$padj < 0.05, ]
+# 2. Create output directory
+dir.create("results/figures/06_heatmap_top_genes", recursive = TRUE, showWarnings = FALSE)
 
-# 2. Sort genes by adjusted p-value
+# 2. Keep only significant genes
+
+# non-strict filter
+# sig_res <- res_df[!is.na(res_df$padj) & res_df$padj < 0.05, ]
+
+sig_res <- res_df[
+  !is.na(res_df$padj) &
+  res_df$padj < 0.05 &
+  abs(res_df$log2FoldChange) > 1,
+]
+
+# 3. Sort genes by adjusted p-value
 sig_res <- sig_res[order(sig_res$padj), ]
 
-# 3. Select top 30 DE genes (or fewer if less than 30 are available)
+# 4. Select top 30 DE genes (or fewer if less than 30 are available)
 n_top <- min(30, nrow(sig_res))
 top_genes <- rownames(sig_res)[1:n_top]
 
-# 4. Extract VST-normalized expression values for selected genes
+# 5. Extract VST-normalized expression values for selected genes
 mat <- assay(vsd)[top_genes, ]
 
-# 5. Prepare sample annotation
+# 6. Prepare sample annotation
 annotation_col <- as.data.frame(colData(vsd)[, "condition_short", drop = FALSE])
 
-# 6. Define annotation colors
+# 7. Define annotation colors
 annotation_colors <- list(
   condition_short = c(
     "AS" = "#F4B6C2",
@@ -28,7 +42,9 @@ annotation_colors <- list(
   )
 )
 
-# 7. Plot heatmap
+# 8. Heatmap with Ensembl IDs
+png("results/figures/06_heatmap_top_genes/heatmap_top_de_genes_strict.png", width = 1000, height = 900, res = 150)
+
 pheatmap(
   mat,
   scale = "row",
@@ -44,8 +60,28 @@ pheatmap(
   main = paste0("Top ", n_top, " DE genes: HCM vs AS")
 )
 
-# 8. Save heatmap to file
-png("results/figures/06_heatmap_top_de_genes.png", width = 1000, height = 900, res = 150)
+dev.off()
+
+
+# 9. Map Ensembl IDs → gene symbols
+
+# Map Ensembl IDs with version numbers removed
+top_genes_clean <- sub("\\..*$", "", top_genes)
+
+gene_symbols <- mapIds(
+  org.Hs.eg.db,
+  keys = top_genes_clean,
+  column = "SYMBOL",
+  keytype = "ENSEMBL",
+  multiVals = "first"
+)
+
+# 10. Replace rownames with gene symbols (fallback to Ensembl if NA)
+rownames(mat) <- ifelse(is.na(gene_symbols), top_genes, gene_symbols)
+
+
+# 11. Heatmap with gene symbols
+png("results/figures/06_heatmap_top_genes/heatmap_top_de_genes_symbols_strict.png", width = 1000, height = 900, res = 150)
 
 pheatmap(
   mat,
@@ -59,7 +95,7 @@ pheatmap(
   fontsize_row = 8,
   fontsize_col = 10,
   border_color = NA,
-  main = paste0("Top ", n_top, " DE genes: HCM vs AS")
+  main = paste0("Top ", n_top, " DE genes (symbols): HCM vs AS")
 )
 
 dev.off()
