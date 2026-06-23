@@ -32,7 +32,7 @@ res_df$neg_log10_padj <- -log10(res_df$padj)
 
 
 # 6. Volcano plot
-png("results/figures/05_de_visualization/volcano_plot_2.png", width = 1200, height = 800)
+png("results/figures/05_de_visualization/volcano_plot.png", width = 1200, height = 800)
 
 ggplot(res_df, aes(x = log2FoldChange, y = -log10(padj))) +
   geom_point(

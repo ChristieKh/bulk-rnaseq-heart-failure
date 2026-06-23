@@ -10,3 +10,6 @@ results/deg/*.csv
 results/enrichment/*.csv
 
 logs/
+
+.claude/
+.vscode/
