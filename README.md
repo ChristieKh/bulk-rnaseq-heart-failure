@@ -123,3 +123,5 @@ The associated study also included genome-wide DNA methylation analysis, but thi
 - comparison between two pathological states rather than disease versus healthy tissue
 - biological conclusions should be interpreted as transcriptomic associations rather than causal mechanisms
 - analysis starts from public processed gene-level counts rather than raw FASTQ files
+- the differential-expression design models condition only (`~ condition_short`) and does not adjust for sex or age, which are available in the metadata; given the small sample size these potential confounders are not modelled, so some differences may partly reflect demographic imbalance between groups
+- exploratory analysis (PCA, sample-distance heatmap) shows no clear global separation between HCM and AS, indicating the transcriptomic differences are subtle and confined to a limited set of genes rather than a genome-wide shift

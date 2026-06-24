@@ -1,4 +1,4 @@
-name: rnaseq-gse128343
+name: cats-hcm-rnaseq
 channels:
   - conda-forge
   - bioconda

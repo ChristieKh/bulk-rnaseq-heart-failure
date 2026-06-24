@@ -3,7 +3,7 @@
 # --------------------------------------------
 
 counts <- read.delim("data/raw/HCM_vs_stenosis_raw_counts.tsv", row.names = 1, check.names = FALSE)
-meta <- read.csv("data/metadata/sample_metadata.csv", stringsAsFactors = FALSE)
+meta <- read.csv("data/raw/sample_metadata.csv", stringsAsFactors = FALSE)
 
 # --------------------------------------------
 # 2. Quick first look at the objects
@@ -239,11 +239,11 @@ if (!same_sample_order) {
 # --------------------------------------------
 
 # Save cleaned counts and metadata as R objects
-saveRDS(counts, "data/raw/counts_checked.rds")
-saveRDS(meta, "data/metadata/meta_checked.rds")
+saveRDS(counts, "data/processed/counts_checked.rds")
+saveRDS(meta, "data/processed/meta_checked.rds")
 
 cat("\nInput check completed successfully.\n")
 cat("Saved cleaned objects:\n")
-cat("- data/raw/counts_checked.rds\n")
-cat("- data/metadata/meta_checked.rds\n")
+cat("- data/processed/counts_checked.rds\n")
+cat("- data/processed/meta_checked.rds\n")
 
