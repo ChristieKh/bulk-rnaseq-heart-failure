@@ -189,7 +189,7 @@ findings.
 | Samples | 8 HCM / 5 AS | 8 HCM / 5 AS |
 | DEGs (`padj < 0.05`) | 193 | 109 |
 | Direction skew | 149/193 (77%) lower in HCM | 67/109 (61%) higher in AS (lower in HCM) |
-| Strict (`|log2FC| > 1`) | 52 (38 down, 14 up) | 35 (20 higher in AS, 15 higher in HCM) |
+| Strict (`log2FC > 1`) | 52 (38 down, 14 up) | 35 (20 higher in AS, 15 higher in HCM) |
 | GO themes | locomotion, muscle structure development, neuron migration, cytoskeleton | ECM organization + neuronal/morphogenesis (AS); mitochondrial/energetic + translation (HCM) |
 
 **Concordance of key genes.** Several genes highlighted by the original authors
