@@ -66,20 +66,50 @@ This makes it a practical dataset for building a reproducible workflow while sti
 
 The analysis uses public GEO files together with a cleaned project-specific sample sheet.
 
-- `data/raw/GSE206978_HCM_vs_stenosis_raw_counts.tsv.gz` — gene-level raw count matrix
-- `data/raw/GSE206978_Sample_description.tsv` — sample-level metadata from GEO
-- `data/metadata/sample_table_hcm_vs_as.csv` — cleaned analysis-ready sample table
+- `data/raw/HCM_vs_stenosis_raw_counts.tsv` — gene-level raw count matrix (60,723 genes × 13 samples, Ensembl IDs)
+- `data/raw/Sample_description.tsv` — sample-level metadata from GEO
+- `data/raw/sample_metadata.csv` — cleaned, analysis-ready sample table (sample ID, condition, sex, age)
+
+Validated and intermediate objects produced during the pipeline (checked counts, filtered matrix, DESeq2 objects, results tables) are written to `data/processed/`.
 
 ## Analytical workflow
 
-1. Import raw counts and sample metadata  
-2. Build an analysis-ready sample table  
-3. Perform sample-level quality checks and exploratory analysis  
-4. Apply count transformation for visualization  
-5. Run differential expression analysis with **DESeq2**  
-6. Generate PCA, volcano plot, and heatmap of top differentially expressed genes  
-7. Perform functional enrichment analysis  
-8. Interpret results in the context of cardiac hypertrophic remodeling
+The pipeline is organised as a sequence of numbered R scripts in `scripts/`,
+each consuming the output of the previous step:
+
+| Step | Script | What it does |
+|---|---|---|
+| 01 | `01_load_and_validate_input.R` | Load raw counts + metadata, run integrity checks, align metadata to count columns, set `condition` factor (AS as reference) |
+| 02 | `02_filter_low_counts.R` | Group-aware filtering of low-count genes (≥10 counts in ≥3 samples of either group) |
+| 03 | `03_deseq2_setup_and_sample_qc.R` | Build DESeq2 dataset, size-factor normalization, VST, sample-level QC (library sizes, PCA, sample-distance heatmap) |
+| 04 | `04_differential_expression.R` | Differential expression with **DESeq2** (HCM vs AS), result tables, MA plot |
+| 05 | `05_de_visualization.R` | Volcano plot of DE results |
+| 06 | `06_heatmap_top_de_genes.R` | Heatmap of the top differentially expressed genes |
+| 07 | `07_annotate_top_de_genes.R` | Annotate DE genes (Ensembl → symbol + name), split into up-in-HCM / higher-in-AS |
+| 08 | `08_enrichment_ora.R` | Over-representation analysis (GO:BP) of the DE gene sets |
+| 09 | `09_gsea.R` | Gene Set Enrichment Analysis (GO:BP) over all genes ranked by log2FC |
+| 10 | `10_enrichment_plots.R` | Dot-plot visualisation of the GSEA results |
+
+## Environment and how to run
+
+The analysis runs in R (4.4) with Bioconductor packages, managed through a
+conda environment defined in `environment.yml` (key packages: **DESeq2**,
+**clusterProfiler**, **enrichplot**, **org.Hs.eg.db**, **pheatmap**, **ggplot2**).
+
+```bash
+# create and activate the environment
+conda env create -f environment.yml
+conda activate hcm-vs-as-rnaseq
+
+# run the pipeline in order
+Rscript scripts/01_load_and_validate_input.R
+Rscript scripts/02_filter_low_counts.R
+# ... through to:
+Rscript scripts/10_enrichment_plots.R
+```
+
+Each script reads from `data/processed/` (and `data/raw/` for step 01) and
+writes its outputs to `results/` and `data/processed/`.
 
 ## Main outputs
 

@@ -1,16 +1,13 @@
-name: cats-hcm-rnaseq
+name: hcm-vs-as-rnaseq
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - r-base=4.3
-  - r-tidyverse
-  - r-data.table
-  - r-readr
+  - r-base=4.4
   - r-pheatmap
   - r-ggplot2
   - bioconductor-deseq2
-  - bioconductor-apeglm
-  - bioconductor-enhancedvolcano
   - bioconductor-clusterprofiler
+  - bioconductor-enrichplot
   - bioconductor-org.hs.eg.db
+  - bioconductor-annotationdbi
