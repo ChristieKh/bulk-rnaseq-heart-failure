@@ -1,3 +1,11 @@
+# ============================================
+# Step 02. Filter low-count genes
+# ============================================
+# Removes genes with too few reads to be informative, using group-aware
+# filtering: a gene is kept if it has count >= 10 in at least 3 samples
+# of EITHER condition (so genes specific to one group are not lost).
+
+# 1. Load checked input
 counts <- readRDS("data/processed/counts_checked.rds")
 meta <- readRDS("data/processed/meta_checked.rds")
 

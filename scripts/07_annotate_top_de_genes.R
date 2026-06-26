@@ -1,4 +1,9 @@
-# Step 07: Annotate and split DE genes into upregulated in HCM and higher in AS
+# ============================================
+# Step 07. Annotate and split DE genes
+# ============================================
+# Annotates the strict DE genes with gene symbols and full names, splits
+# them into "upregulated in HCM" and "higher in AS", and saves the
+# annotated tables.
 
 library(org.Hs.eg.db)
 library(AnnotationDbi)

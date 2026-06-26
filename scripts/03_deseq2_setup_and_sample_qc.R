@@ -1,12 +1,10 @@
+# ============================================
 # Step 03. DESeq2 setup and sample-level QC
-
-# This script:
-# 1) loads filtered counts and metadata
-# 2) creates a DESeq2 dataset
-# 3) performs initial normalization setup
-# 4) applies variance stabilizing transformation
-# 5) prepares objects for sample-level QC plots
-
+# ============================================
+# Builds the DESeq2 dataset (design = ~ condition_short), estimates size
+# factors, applies the variance-stabilizing transformation, and produces
+# sample-level QC plots: library sizes, VST boxplot, PCA, and a
+# sample-to-sample distance heatmap.
 
 library(DESeq2)
 
