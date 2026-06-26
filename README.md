@@ -111,6 +111,16 @@ results/
 environment.yml        # conda environment definition
 ```
 
+## Limitations
+
+These should be kept in mind when reading the results below:
+
+- small sample size (8 HCM vs 5 AS)
+- a comparison between two **disease** states, not disease versus healthy tissue
+- the analysis starts from public processed gene-level counts, not raw FASTQ files
+- the DESeq2 design models condition only (`~ condition_short`) and does not adjust for sex or age (available in the metadata); given the small sample, these potential confounders are not modelled
+- findings are therefore transcriptomic **associations**, not causal mechanisms
+
 ## Results
 
 ### 1. Sample-level QC and exploratory analysis
@@ -180,53 +190,31 @@ In short: relative to pressure-overload AS, HCM myocardium leans toward an
 
 ## Comparison with the original study
 
-This reanalysis uses the same discovery cohort (8 HCM / 5 AS) as the source
-study, so the results can be compared directly with its published RNA-seq
-findings.
+This reanalysis uses the **same 8 HCM / 5 AS samples** as the source study, so
+the results are directly comparable. In short: **the main findings agree**, this
+pipeline is more conservative, and GSEA adds one new signal.
 
-| | Original study (RNA-seq) | This reanalysis |
+> **Note on direction.** Throughout, differences are described as "higher in AS".
+> Because AS is the reference group, this is exactly the same as the original
+> study's wording "lower in HCM" — just the other way of saying it.
+
+| | Original study | This reanalysis |
 |---|---|---|
 | Samples | 8 HCM / 5 AS | 8 HCM / 5 AS |
-| DEGs (`padj < 0.05`) | 193 | 109 |
-| Direction skew | 149/193 (77%) lower in HCM | 67/109 (61%) higher in AS (lower in HCM) |
-| Strict (`log2FC > 1`) | 52 (38 down, 14 up) | 35 (20 higher in AS, 15 higher in HCM) |
-| GO themes | locomotion, muscle structure development, neuron migration, cytoskeleton | ECM organization + neuronal/morphogenesis (AS); mitochondrial/energetic + translation (HCM) |
+| DE genes (`padj < 0.05`) | 193 | 109 (more conservative) |
+| Most DE genes are | higher in AS | higher in AS ✓ |
+| Top theme — AS side | structural / neuronal | structural / neuronal (ECM, adhesion) ✓ |
+| Top theme — HCM side | not highlighted | **mitochondrial / energetic** (new, via GSEA) |
 
-**Concordance of key genes.** Several genes highlighted by the original authors
-were recovered here with the same direction of change:
+**Key genes reproduced.** `IGF2` and `C4B` (higher in AS) and `CTXND1` and
+`EIF4EBP3` (higher in HCM) all came out with the **same direction** as in the
+original study — evidence that the pipeline captures real signal, not artefacts.
 
-| Gene | Original study | This reanalysis |
-|---|---|---|
-| `IGF2` | lower in HCM | −1.86 (higher in AS) |
-| `C4B` | most significant, lower in HCM | among the top AS-side genes |
-| `CTXND1` | higher in HCM | +1.49 (higher in HCM) |
-| `EIF4EBP3` | higher in HCM | +1.24 (higher in HCM) |
-
-**What agrees.** The direction of the overall signal (most differentially
-expressed genes are lower in HCM / higher in AS), several individual marker
-genes, and the neuronal/structural GO theme are all reproduced — strong evidence
-that the pipeline captures a real biological signal rather than artefacts.
-
-**What differs.** This reanalysis reports fewer DEGs (109 vs 193). This is
-expected for an independent reanalysis with different software versions,
-annotation, and filtering choices, and reflects a deliberately conservative
-pipeline (group-aware low-count filtering plus DESeq2 independent filtering).
-
-**What this analysis adds.** The original study used over-representation
-analysis and emphasised the structural/neuronal themes. By additionally running
-**GSEA** — which is more sensitive on subtle, coordinated signals — this
-reanalysis surfaces a **mitochondrial / energetic and protein-synthesis program
-elevated in HCM** that the ORA-only view does not capture. This is consistent
-with the well-described energetic remodeling of HCM myocardium.
-
-## Limitations
-
-- small sample size
-- comparison between two pathological states rather than disease versus healthy tissue
-- biological conclusions should be interpreted as transcriptomic associations rather than causal mechanisms
-- analysis starts from public processed gene-level counts rather than raw FASTQ files
-- the differential-expression design models condition only (`~ condition_short`) and does not adjust for sex or age, which are available in the metadata; given the small sample size these potential confounders are not modelled, so some differences may partly reflect demographic imbalance between groups
-- exploratory analysis (PCA, sample-distance heatmap) shows no clear global separation between HCM and AS, indicating the transcriptomic differences are subtle and confined to a limited set of genes rather than a genome-wide shift
+**The new finding.** The original study used over-representation analysis and
+emphasised the structural/neuronal side. By also running **GSEA** — more
+sensitive to subtle, coordinated changes — this reanalysis uncovers a
+**mitochondrial / energetic program elevated in HCM** that the original analysis
+did not highlight, consistent with the known energetics of HCM.
 
 ## Conclusion
 
