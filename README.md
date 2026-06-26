@@ -35,19 +35,6 @@ In **HCM**, hypertrophy reflects a primary disorder of the myocardium, often lin
 
 This makes the HCM-versus-AS comparison biologically informative: both groups show hypertrophied myocardium, but the underlying drivers of remodeling differ. The project therefore focuses on transcriptomic features that distinguish **primary myocardial disease** from **pressure-overload remodeling**.
 
-## Why this dataset
-
-I selected **GSE206978** because it is well suited to a first focused analytical RNA-seq project in cardiac disease.
-
-It provides:
-- human myocardial tissue
-- bulk RNA-seq data
-- a gene-level raw count matrix suitable for **DESeq2**
-- a clearly defined comparison with direct biological meaning
-- a manageable sample size for exploratory and differential-expression analysis
-
-This makes it a practical dataset for building a reproducible workflow while still engaging with a meaningful disease-related question.
-
 ## Dataset
 
 **Accession:** GSE206978  
@@ -111,41 +98,126 @@ Rscript scripts/10_enrichment_plots.R
 Each script reads from `data/processed/` (and `data/raw/` for step 01) and
 writes its outputs to `results/` and `data/processed/`.
 
-## Main outputs
-
-- cleaned metadata table
-- analysis-ready sample sheet
-- PCA plot
-- sample distance heatmap
-- volcano plot
-- heatmap of top differentially expressed genes
-- differential expression results table
-- functional enrichment results
-- interpretation notes for key biological patterns
-
 ## Repository structure
 
 ```text
 data/
-scripts/
+  raw/                 # input count matrix + sample metadata
+  processed/           # validated counts, DESeq2 objects, results (.rds)
+scripts/               # numbered pipeline scripts 01–10
 results/
-docs/
+  figures/             # QC, volcano, heatmap, GSEA dot plot
+  tables/              # DE results and enrichment tables
+environment.yml        # conda environment definition
 ```
 
-## Project scope
+## Results
 
-This repository focuses on analytical interpretation of a public bulk RNA-seq dataset using gene-level raw counts.
+### 1. Sample-level QC and exploratory analysis
 
-The current analysis is designed to emphasize:
+Library sizes were comparable across all 13 samples, and no sample behaved as
+a technical outlier. However, principal component analysis did **not** separate
+HCM and AS: the two groups overlap across the plot, and the leading components
+explain only a modest fraction of the variance (PC1 ≈ 22%, PC2 ≈ 19%). The
+sample-to-sample distance heatmap tells the same story — samples do not cluster
+cleanly by condition.
 
-- study design and contrast definition
-- metadata handling
-- exploratory transcriptomic analysis
-- differential expression analysis with DESeq2
-- pathway-level interpretation
-- biologically informed discussion of cardiac remodeling
+![PCA of HCM vs AS](results/figures/03_sample_qc/pca_plot.png)
 
-The associated study also included genome-wide DNA methylation analysis, but this repository is currently limited to the RNA-seq component.
+This is an informative negative result rather than a failure: both groups are
+hypertrophied, diseased myocardium, so their global transcriptomes are similar.
+It sets the expectation that any HCM-vs-AS differences will be **subtle and
+confined to a limited set of genes**, not a genome-wide shift.
+
+### 2. Differential expression (DESeq2)
+
+Of **16,693** tested genes, **109** were differentially expressed at
+`padj < 0.05`, and **35** passed the stricter threshold of
+`padj < 0.05 & |log2FoldChange| > 1`. With AS as the reference level, the
+results are skewed toward genes that are **higher in AS / lower in HCM**
+(67 vs 42 at `padj < 0.05`), consistent with the original study.
+
+Representative genes:
+
+| Direction | Genes |
+|---|---|
+| Higher in HCM | `CTXND1`, `EIF4EBP3`, `PCDHGC4`, `ATRNL1` |
+| Higher in AS (lower in HCM) | `IGF2`, `SPOCK1`, `ITGA11`, `C4B`, `KCNT1` |
+
+The volcano plot shows the overall picture (blue = higher in AS, red = higher
+in HCM), and the heatmap of the top genes confirms that these differences are
+consistent across samples rather than driven by single outliers.
+
+![Volcano plot](results/figures/05_de_visualization/volcano_plot.png)
+
+![Heatmap of top DE genes](results/figures/06_heatmap_top_genes/heatmap_top_de_genes_symbols_strict.png)
+
+### 3. Functional enrichment
+
+**Over-representation analysis (ORA, GO:BP).** Run on the significant gene sets,
+ORA found enrichment only on the AS side: genes higher in AS were
+over-represented for **cell-substrate adhesion** (e.g. `ITGA11`, `SPOCK1`,
+`CCDC80`, `LAMA5`, `FLNA`, `NOTCH1`). The shorter HCM gene list yielded no
+significant terms — expected for ORA on a small, scattered set.
+
+**Gene set enrichment analysis (GSEA, GO:BP).** Using all genes ranked by
+log2FoldChange (no cutoff), GSEA was far more sensitive and recovered a clear,
+interpretable contrast:
+
+- **Higher in HCM:** mitochondrial and energy-related programs —
+  *oxidative phosphorylation*, *aerobic respiration*, *ATP synthesis*,
+  *mitochondrial translation* — together with *ribosome biogenesis* and
+  *cytoplasmic translation* (energy production + protein-synthesis machinery).
+- **Higher in AS:** *extracellular matrix organization*, *cell junction
+  assembly*, and a cluster of *neuronal / morphogenesis* terms — a structural,
+  remodeling-oriented signature.
+
+![GSEA dot plot](results/figures/10_enrichment/gsea_dotplot.png)
+
+In short: relative to pressure-overload AS, HCM myocardium leans toward an
+**energetic / mitochondrial and biosynthetic** program, while AS leans toward
+**extracellular-matrix remodeling and structural** programs.
+
+## Comparison with the original study
+
+This reanalysis uses the same discovery cohort (8 HCM / 5 AS) as the source
+study, so the results can be compared directly with its published RNA-seq
+findings.
+
+| | Original study (RNA-seq) | This reanalysis |
+|---|---|---|
+| Samples | 8 HCM / 5 AS | 8 HCM / 5 AS |
+| DEGs (`padj < 0.05`) | 193 | 109 |
+| Direction skew | 149/193 (77%) lower in HCM | 67/109 (61%) higher in AS (lower in HCM) |
+| Strict (`|log2FC| > 1`) | 52 (38 down, 14 up) | 35 (20 higher in AS, 15 higher in HCM) |
+| GO themes | locomotion, muscle structure development, neuron migration, cytoskeleton | ECM organization + neuronal/morphogenesis (AS); mitochondrial/energetic + translation (HCM) |
+
+**Concordance of key genes.** Several genes highlighted by the original authors
+were recovered here with the same direction of change:
+
+| Gene | Original study | This reanalysis |
+|---|---|---|
+| `IGF2` | lower in HCM | −1.86 (higher in AS) |
+| `C4B` | most significant, lower in HCM | among the top AS-side genes |
+| `CTXND1` | higher in HCM | +1.49 (higher in HCM) |
+| `EIF4EBP3` | higher in HCM | +1.24 (higher in HCM) |
+
+**What agrees.** The direction of the overall signal (most differentially
+expressed genes are lower in HCM / higher in AS), several individual marker
+genes, and the neuronal/structural GO theme are all reproduced — strong evidence
+that the pipeline captures a real biological signal rather than artefacts.
+
+**What differs.** This reanalysis reports fewer DEGs (109 vs 193). This is
+expected for an independent reanalysis with different software versions,
+annotation, and filtering choices, and reflects a deliberately conservative
+pipeline (group-aware low-count filtering plus DESeq2 independent filtering).
+
+**What this analysis adds.** The original study used over-representation
+analysis and emphasised the structural/neuronal themes. By additionally running
+**GSEA** — which is more sensitive on subtle, coordinated signals — this
+reanalysis surfaces a **mitochondrial / energetic and protein-synthesis program
+elevated in HCM** that the ORA-only view does not capture. This is consistent
+with the well-described energetic remodeling of HCM myocardium.
 
 ## Limitations
 
@@ -155,3 +227,15 @@ The associated study also included genome-wide DNA methylation analysis, but thi
 - analysis starts from public processed gene-level counts rather than raw FASTQ files
 - the differential-expression design models condition only (`~ condition_short`) and does not adjust for sex or age, which are available in the metadata; given the small sample size these potential confounders are not modelled, so some differences may partly reflect demographic imbalance between groups
 - exploratory analysis (PCA, sample-distance heatmap) shows no clear global separation between HCM and AS, indicating the transcriptomic differences are subtle and confined to a limited set of genes rather than a genome-wide shift
+
+## Conclusion
+
+HCM and AS myocardium are globally similar at the transcriptome level — the
+groups do not separate in unsupervised analysis — but they differ in a focused
+set of genes and pathways. Relative to pressure-overload AS, HCM is associated
+with an **energetic / mitochondrial and biosynthetic** program, while AS is
+associated with **extracellular-matrix remodeling and structural** programs.
+This independent reanalysis reproduces the key genes and the direction of the
+published results, and adds an energetic signal in HCM via a more sensitive
+enrichment method. Given the small sample size and the design, these findings
+should be read as **transcriptomic associations** rather than causal mechanisms.
