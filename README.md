@@ -147,16 +147,23 @@ Of **16,693** tested genes, **109** were differentially expressed at
 results are skewed toward genes that are **higher in AS / lower in HCM**
 (67 vs 42 at `padj < 0.05`), consistent with the original study.
 
-Representative genes:
+Among the top differentially expressed genes, those most relevant to the study's
+themes (and not chosen at random) are:
 
-| Direction | Genes |
+| Higher in AS | Higher in HCM |
 |---|---|
-| Higher in HCM | `CTXND1`, `EIF4EBP3`, `PCDHGC4`, `ATRNL1` |
-| Higher in AS (lower in HCM) | `IGF2`, `SPOCK1`, `ITGA11`, `C4B`, `KCNT1` |
+| `BGN` — biglycan, extracellular matrix / fibrosis | `MTND4P35` — mitochondrial *MT-ND4* pseudogene |
+| `SPOCK1` — proteoglycan, extracellular matrix | `SNAP91` — synaptic vesicle protein |
+| `ITGA11` — integrin, cell–matrix adhesion | `GSG1L` — synaptic (AMPA-receptor) |
+| `C4B` — complement, immune | |
+| `IGF2` — growth factor | |
 
-The volcano plot shows the overall picture (blue = higher in AS, red = higher
-in HCM), and the heatmap of the top genes confirms that these differences are
-consistent across samples rather than driven by single outliers.
+The AS side has clear, well-characterised markers (matrix, immune, growth). The
+HCM side has no comparable single marker — its strongest individual genes are a
+mitochondrial pseudogene and neuronal genes, and its main signal is
+**collective**, emerging only at the pathway level (see enrichment). The heatmap
+confirms these patterns are consistent across samples; the volcano plot
+(blue = higher in AS, red = higher in HCM) shows the same overall picture.
 
 ![Volcano plot](results/figures/05_de_visualization/volcano_plot.png)
 
@@ -184,9 +191,24 @@ interpretable contrast:
 
 ![GSEA dot plot](results/figures/10_enrichment/gsea_dotplot.png)
 
-In short: relative to pressure-overload AS, HCM myocardium leans toward an
-**energetic / mitochondrial and biosynthetic** program, while AS leans toward
-**extracellular-matrix remodeling and structural** programs.
+### 4. Biological interpretation
+
+The two diseases reach a similar end state — thickened, diseased muscle —
+through different transcriptional programs:
+
+| | Higher in AS | Higher in HCM |
+|---|---|---|
+| Dominant program | extracellular matrix / fibrosis | mitochondrial / energetic + protein synthesis |
+| Signal character | a few strongly differential genes | many genes shifted slightly |
+| Detected by | ORA **and** GSEA | GSEA **only** |
+
+The loud-versus-collective contrast in the last two rows is the practical reason
+both enrichment methods were applied: ORA works from a fixed gene list and
+captured the AS matrix signal but missed the coordinated HCM energetic shift,
+which only GSEA recovered. A neuronal / innervation theme appears on **both**
+sides; because bulk RNA-seq mixes cardiomyocytes with nerve fibres and other
+cell types, it is interpreted cautiously and may partly reflect tissue
+composition.
 
 ## Comparison with the original study
 
@@ -204,26 +226,28 @@ pipeline is more conservative, and GSEA adds one new signal.
 | DE genes (`padj < 0.05`) | 193 | 109 (more conservative) |
 | Most DE genes are | higher in AS | higher in AS ✓ |
 | Top theme — AS side | structural / neuronal | structural / neuronal (ECM, adhesion) ✓ |
-| Top theme — HCM side | not highlighted | **mitochondrial / energetic** (new, via GSEA) |
+| Top theme — HCM side | reported as *not* detected | **mitochondrial / energetic** (via GSEA) |
 
 **Key genes reproduced.** `IGF2` and `C4B` (higher in AS) and `CTXND1` and
 `EIF4EBP3` (higher in HCM) all came out with the **same direction** as in the
 original study — evidence that the pipeline captures real signal, not artefacts.
 
-**The new finding.** The original study used over-representation analysis and
-emphasised the structural/neuronal side. By also running **GSEA** — more
-sensitive to subtle, coordinated changes — this reanalysis uncovers a
-**mitochondrial / energetic program elevated in HCM** that the original analysis
-did not highlight, consistent with the known energetics of HCM.
+**A divergence worth noting.** Using over-representation analysis, the original
+study **explicitly reported *not* finding** dysregulation of ATP-synthesis /
+mitochondrial pathways in HCM, reasoning that these processes are shared between
+HCM and AS. Using **GSEA** — a threshold-free, ranked-gene method more sensitive
+to subtle, coordinated shifts — this reanalysis instead detected a
+**mitochondrial / energetic program relatively elevated in HCM versus AS**. This
+divergence is most likely methodological (GSEA captures coordinated changes that
+DEG-threshold ORA can miss) and is best read as a hypothesis to revisit, not a
+correction of the original conclusion.
 
 ## Conclusion
 
-HCM and AS myocardium are globally similar at the transcriptome level — the
-groups do not separate in unsupervised analysis — but they differ in a focused
-set of genes and pathways. Relative to pressure-overload AS, HCM is associated
-with an **energetic / mitochondrial and biosynthetic** program, while AS is
-associated with **extracellular-matrix remodeling and structural** programs.
-This independent reanalysis reproduces the key genes and the direction of the
-published results, and adds an energetic signal in HCM via a more sensitive
-enrichment method. Given the small sample size and the design, these findings
-should be read as **transcriptomic associations** rather than causal mechanisms.
+HCM and AS myocardium are globally similar — they do not separate in
+unsupervised analysis — but differ in a focused set of genes and pathways
+(summarised above). This independent reanalysis reproduces the key genes and the
+direction of the published results and, through GSEA, adds an energetic signal in
+HCM not reported in the original study. Given the small sample and the
+two-disease design, these findings are best read as **transcriptomic
+associations** rather than causal mechanisms.
